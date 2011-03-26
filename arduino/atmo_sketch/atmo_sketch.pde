@@ -39,7 +39,7 @@ int current_cmd[ATMO_COMMAND_SIZE] = { 0 };
 
 
 int serialRead() {
-  while (!Serial.available()) { }
+  while (!Serial.available());
   return Serial.read();
 }
 
