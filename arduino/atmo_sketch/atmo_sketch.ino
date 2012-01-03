@@ -1,7 +1,7 @@
 /*****************************************************************************
  * This file is part of atmo-client
  *****************************************************************************
- * Copyright (C) 2011 vobject <vobject@gmail.com>
+ * Copyright (C) 2011-2012 vobject <vobject@gmail.com>
  *
  * atmo-client is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -30,42 +30,71 @@
 #define CHANNEL_BOTTOM_G   17
 #define CHANNEL_BOTTOM_B   18
 
-const size_t redPin   = 11;
-const size_t greenPin = 10;
-const size_t bluePin  =  9;
+const unsigned int redPin   = 11;
+const unsigned int greenPin = 10;
+const unsigned int bluePin  =  9;
 
 const uint8_t ATMO_COMMAND_SIZE = 16;
-int current_cmd[ATMO_COMMAND_SIZE] = { 0 };
+uint8_t current_cmd[ATMO_COMMAND_SIZE] = { 0 };
 
-
-int serialRead() {
-  while (!Serial.available());
-  return Serial.read();
+int serialRead()
+{
+   while (!Serial.available());
+   return Serial.read();
 }
-
 
 void setup()
 {
-  // atmo plugin sends at 38400 baud.
-  Serial.begin(38400);
+   pinMode(redPin, OUTPUT);
+   pinMode(greenPin, OUTPUT);
+   pinMode(bluePin, OUTPUT);
+
+   // atmo plugin sends at 38400 baud.
+   Serial.begin(38400);
 }
 
 void loop()
 {
-  if (Serial.available()) {
-    if (0xff == Serial.read() &&
-        0x00 == serialRead()  &&
-        0x00 == serialRead()) {
-      for (uint8_t i = 0; i < ATMO_COMMAND_SIZE; ++i) {
-        current_cmd[i] = serialRead();
-      }
+   if (Serial.available())
+   {
+      if (0xff == Serial.read() &&
+          0x00 == serialRead()  &&
+          0x00 == serialRead())
+      {
+         for (uint8_t i = 0; i < ATMO_COMMAND_SIZE; ++i)
+         {
+            current_cmd[i] = serialRead();
+         }
 
-      analogWrite(redPin,   current_cmd[CHANNEL_LEFT_R]);
-      analogWrite(greenPin, current_cmd[CHANNEL_LEFT_G]);
-      analogWrite(bluePin,  current_cmd[CHANNEL_LEFT_B]);
-    }
-  }
-  else {
-    delay(5);
-  }
+//         analogWrite(redPin,   current_cmd[CHANNEL_LEFT_R]);
+//         analogWrite(greenPin, current_cmd[CHANNEL_LEFT_G]);
+//         analogWrite(bluePin,  current_cmd[CHANNEL_LEFT_B]);
+
+         const int red = 
+           (current_cmd[CHANNEL_LEFT_R]  +
+            current_cmd[CHANNEL_RIGHT_R] +
+            current_cmd[CHANNEL_TOP_R]   +
+            current_cmd[CHANNEL_BOTTOM_R]) / 4;
+
+         const int green = 
+           (current_cmd[CHANNEL_LEFT_G]  +
+            current_cmd[CHANNEL_RIGHT_G] +
+            current_cmd[CHANNEL_TOP_G]   +
+            current_cmd[CHANNEL_BOTTOM_G]) / 4;
+
+         const int blue =
+           (current_cmd[CHANNEL_LEFT_B]  +
+            current_cmd[CHANNEL_RIGHT_B] +
+            current_cmd[CHANNEL_TOP_B]   +
+            current_cmd[CHANNEL_BOTTOM_B]) / 4;
+
+         analogWrite(redPin,   red);
+         analogWrite(greenPin, green);
+         analogWrite(bluePin,  blue);
+      }
+   }
+   else
+   {
+      delay(5);
+   }
 }
