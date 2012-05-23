@@ -1,13 +1,13 @@
 atmo-client
 ===========
 
-A program for the Arduino that processes the [atmolight](http://www.vdr-wiki.de/wiki/index.php/Atmo-plugin) protocol.
+A program for the Arduino that processes the [Atmo-Light](http://www.vdr-wiki.de/wiki/index.php/Atmo-Light) [protocol](http://www.vdr-wiki.de/wiki/index.php/Atmo-plugin).
 
 DONE
 ----
 
 * Arduino sketch
-* Fritzing (shows ULN2803, but [ULN2804](http://www.datasheetcatalog.net/de/datasheets_pdf/U/L/N/2/ULN2804.shtml) was acutally used)
+* Fritzing (shows ULN2803, but [ULN2804](http://www.datasheetcatalog.net/de/datasheets_pdf/U/L/N/2/ULN2804.shtml) was actually used)
 
 TODO
 ----
