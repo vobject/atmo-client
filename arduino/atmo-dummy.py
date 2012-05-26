@@ -1,4 +1,4 @@
-﻿"""
+"""
 Test script to check the output of the VLC atmolight plugin.
 
 Connect to a (virtual) COM port where the atmolight protocol is send
@@ -54,5 +54,9 @@ class AtmoDummy(tk.Tk):
         if self.i0.get() < self.progress_channel0["maximum"]:
             self.after(75, self.read_bytes5)
 
-app = AtmoDummy()
-app.mainloop()
+if __name__ == "__main__":
+  try:
+    app = AtmoDummy()
+    app.mainloop()
+  except:
+    traceback.print_exc()
