@@ -19,6 +19,7 @@ through and display the content.
 import tkinter as tk
 from tkinter import ttk
 
+import sys
 import serial
 import time
 import threading
@@ -28,24 +29,30 @@ protocol = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 class SerialThread(threading.Thread):
     def __init__(self, com_port):
-        threading.Thread.__init__(self)
+        super(SerialThread, self).__init__()
         self.com_port = com_port
+        self.stop_requested = False
 
     def run(self):
         try:
             self.open_serial()
-            while True:
+            while not self.stop_requested:
                 for index, item in enumerate(self.connection.read(19)):
                     protocol[index] = item
-        except KeyboardInterrupt:
             self.close_serial()
+        except:
+            traceback.print_exc()
+
+    def stop(self):
+        self.stop_requested = True
 
     def open_serial(self):
         self.connection = serial.Serial(self.com_port,
                                         baudrate=38400,
                                         parity=serial.PARITY_NONE,
                                         bytesize=serial.EIGHTBITS,
-                                        stopbits=serial.STOPBITS_ONE)
+                                        stopbits=serial.STOPBITS_ONE,
+                                        timeout=1)
 
     def close_serial(self):
         self.connection.close()
@@ -95,7 +102,7 @@ class AtmoDummy(tk.Tk):
         #self.button5 = ttk.Button(text="start5", command=self.start5)
         #self.button5.grid(column=4, row=0)
 
-        self.after(50, self.update_gui)
+        self.after(30, self.update_gui)
 
     #def start(self):
         #self.progress_channel0["value"] = 0
@@ -120,14 +127,16 @@ class AtmoDummy(tk.Tk):
         self.channel_2.update(protocol[10], protocol[11], protocol[12])
         self.channel_3.update(protocol[13], protocol[14], protocol[15])
         self.channel_4.update(protocol[16], protocol[17], protocol[18])
-        self.after(50, self.update_gui)
+        self.after(30, self.update_gui)
 
 if __name__ == "__main__":
     try:
-        reader = SerialThread("/dev/pts/6")
+        reader = SerialThread(sys.argv[1])
         reader.start()
 
         app = AtmoDummy()
         app.mainloop()
+
+        reader.stop()
     except:
         traceback.print_exc()
